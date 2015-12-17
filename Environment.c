@@ -23,6 +23,7 @@
 
 #include "Environment.h"
 
+#define repeat
 
 
 /* Private variables ---------------------------------------------------------*/
@@ -233,6 +234,8 @@ static void Check_Data_Queue(void *argument)
     
     /*for test*/
     uint16_t* temp_int = NULL;
+    
+    //uint16_t* Pri_int = NULL;
 
 	uint8_t buff[6] ={0,0,0,0,0,0};
     
@@ -252,11 +255,14 @@ static void Check_Data_Queue(void *argument)
            if(uxQueueMessagesWaiting(xQueue_EPS) <= (Queue_EPS_Size-5))
             {
                  /* Read data from the text file */
-                f_read(&MyFile, rtext, sizeof(uint16_t)*5, (void *)&bytesread);   
+                f_read(&MyFile, rtext, sizeof(type_envEPS_Battery_Voltage)*5, (void *)&bytesread);   
             
                 //prvNewPrintString("Not Enough ",11);
-            
-                for(i=0;i<5;i++)
+                
+                //sprintf (buff, "%d", bytesread/sizeof(type_envEPS_Battery_Voltage));
+                //prvNewPrintString(buff,6);
+                
+                for(i=0;i<(bytesread/sizeof(type_envEPS_Battery_Voltage));i++)
                 {
                     //創造空間 register相應的空間大小
                     temp_int = (type_envEPS_Battery_Voltage *)malloc(sizeof( type_envEPS_Battery_Voltage ));
@@ -279,14 +285,20 @@ static void Check_Data_Queue(void *argument)
                     /* Print to Screen*/
 
                 }
-                /* Close the open text file */
-                
-            
+                #ifdef repeat
+                if((bytesread/sizeof(type_envEPS_Battery_Voltage))!=5)
+                {
+                    prvNewPrintString("\n",1);
+                    
+                    f_rewind(&MyFile);
+                }
+                #endif
             } 
             
         }
         else
         { 
+            /* Close the open text file */
             f_close(&MyFile);
         }
         //if(xStatus==errQUEUE_FULL)prvNewPrintString(" QUEUE FULL ",12);
