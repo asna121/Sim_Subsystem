@@ -58,14 +58,10 @@ static void Check_Data_Queue(void *argument);
 static void StartThread(void *argument);
 static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
 static void MSC_Application(void);
+static void Error_Handler(void);
 
-
+/* import function*/
 extern void prvNewPrintString (const uint8_t *pcString, const uint8_t size);
-extern void Error_Handler(void);
-
-
-
-
 
 void submain_Environment(void)
 {
@@ -308,3 +304,13 @@ static void Check_Data_Queue(void *argument)
     }
     
 }
+
+
+static void Error_Handler(void)
+{
+  /* Turn LED4 on */
+ // BSP_LED_On(LED4);
+  while(1)
+		prvNewPrintString(" #@Error@# ",12);
+}
+

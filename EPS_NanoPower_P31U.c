@@ -21,6 +21,8 @@
 #include "task.h"
 #include "queue.h"
 
+#include "peripheral.h"
+
 #include "EPS_NanoPower_P31U.h"
 #include "Environment.h"
 
@@ -98,9 +100,6 @@ extern UART_HandleTypeDef UartHandle;
 
 /*I2C communication declaration*/
 priI2C_WriteActionTypeDef I2C_transfer_slave_2;
-
-/* Receive New CMD flag */
-uint8_t priI2C_NewCommand_2 =0;
 
 /* register in module*/
 static eps_get_hk hk_test;
