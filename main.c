@@ -50,7 +50,6 @@ extern I2C_HandleTypeDef I2CxHandle_2;
 
 static void SystemClock_Config(void);
 //static void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength);
-static void Error_Handler(void);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -155,15 +154,6 @@ static void SystemClock_Config(void)
   {
     Error_Handler();
   }
-}
-
-
-static void Error_Handler(void)
-{
-  /* Turn LED4 on */
- // BSP_LED_On(LED4);
-  while(1)
-		prvNewPrintString(" #@Error@# ",12);
 }
 
 // /**

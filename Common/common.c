@@ -29,3 +29,11 @@ void prvNewPrintString (const uint8_t *pcString, const uint8_t size)
     HAL_UART_Transmit(&UartHandle, (uint8_t *)pcString, size, 1000);
     xSemaphoreGive(uart_lock);
 }
+
+void Error_Handler(void)
+{
+  /* Turn LED4 on */
+ // BSP_LED_On(LED4);
+  while(1)
+		prvNewPrintString(" #@Error@# ",12);
+}

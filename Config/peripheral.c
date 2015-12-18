@@ -13,8 +13,6 @@ I2C_HandleTypeDef I2CxHandle_2;
 /* Receive New CMD flag */
 uint8_t priI2Cx_2_NewCommand =0;
 
-static void Error_Handler(void);
-
 void Init_Peripheral(void)
 {
 /*##-1- Configure the UART peripheral ######################################*/
@@ -104,12 +102,4 @@ void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 
-}
-
-void Error_Handler(void)
-{
-  /* Turn LED4 on */
- // BSP_LED_On(LED4);
-  while(1)
-		prvNewPrintString(" #@Error@# ",12);
 }
