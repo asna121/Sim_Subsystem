@@ -38,7 +38,7 @@
 #include "common.h"
 
 /*module*/
-#include "EPS_NanoPower_P31U.h"
+#include "ADCS_Surrey.h"
 #include "Environment.h"
 
 /* Private typedef -----------------------------------------------------------*/
@@ -84,7 +84,7 @@ int main(void)
   submain_Environment();
   
     /* Thread I2C 2*/
-  submain_EPS(&I2CxHandle_2);
+  submain_ADCS(&I2CxHandle_2);
 	
   /* Start scheduler */
   vTaskStartScheduler();

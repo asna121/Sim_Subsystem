@@ -20,13 +20,18 @@ typedef struct
 extern void submain_Environment(void);
 
 #define Queue_EPS_Size  10
+#define Queue_ADCS_Size 10
 
 /* */
 #define ref_envEPS_Battery_Voltage  (0x0100)
+#define ref_envADCS_Estimated_Angular_X  (0x0200)
+#define ref_envADCS_Estimated_Angular_Y  (0x0201)
+#define ref_envADCS_Estimated_Angular_Z  (0x0202)
 
 
 /* */
 #define type_envEPS_Battery_Voltage uint16_t
+#define type_envADCS_Estimated_Angular uint16_t
 
 
 #endif /* __ENVIRONMENT_H */

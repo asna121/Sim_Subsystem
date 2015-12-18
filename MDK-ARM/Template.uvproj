@@ -362,7 +362,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F429xx,USE_STM32F429I_DISCO</Define>
               <Undefine></Undefine>
-              <IncludePath>..\;..\Common;..\..\Package_STM32F4\Drivers\CMSIS\Device;..\..\Package_STM32F4\Drivers\CMSIS\Include;..\..\Package_STM32F4\Drivers\STM32F4xx_HAL_Driver\Inc;..\..\Package_STM32F4\Drivers\BSP\STM32F429I-Discovery;..\..\Package_STM32F4\Middlewares\FreeRTOS\Source\include;..\..\Package_STM32F4\Middlewares\FreeRTOS\Source\portable\RVDS\ARM_CM4F;..\..\Package_STM32F4\Middlewares\FatFs\src;..\..\Package_STM32F4\Middlewares\FatFs\src\drivers;..\..\Package_STM32F4\Middlewares\STM32_USB_Host_Library\Core\Inc;..\..\Package_STM32F4\Middlewares\STM32_USB_Host_Library\Class\MSC\Inc</IncludePath>
+              <IncludePath>..\;..\Config;..\Common;..\..\Package_STM32F4\Drivers\CMSIS\Device;..\..\Package_STM32F4\Drivers\CMSIS\Include;..\..\Package_STM32F4\Drivers\STM32F4xx_HAL_Driver\Inc;..\..\Package_STM32F4\Drivers\BSP\STM32F429I-Discovery;..\..\Package_STM32F4\Middlewares\FreeRTOS\Source\include;..\..\Package_STM32F4\Middlewares\FreeRTOS\Source\portable\RVDS\ARM_CM4F;..\..\Package_STM32F4\Middlewares\FatFs\src;..\..\Package_STM32F4\Middlewares\FatFs\src\drivers;..\..\Package_STM32F4\Middlewares\STM32_USB_Host_Library\Core\Inc;..\..\Package_STM32F4\Middlewares\STM32_USB_Host_Library\Class\MSC\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -413,17 +413,12 @@
             <File>
               <FileName>stm32f4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Common\stm32f4xx_hal_msp.c</FilePath>
+              <FilePath>..\Config\stm32f4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>stm32f4xx_it.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Common\stm32f4xx_it.c</FilePath>
-            </File>
-            <File>
-              <FileName>EPS_NanoPower_P31U.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\EPS_NanoPower_P31U.c</FilePath>
+              <FilePath>..\Config\stm32f4xx_it.c</FilePath>
             </File>
             <File>
               <FileName>Environment.c</FileName>
@@ -433,12 +428,22 @@
             <File>
               <FileName>usbh_conf.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Common\usbh_conf.c</FilePath>
+              <FilePath>..\Config\usbh_conf.c</FilePath>
             </File>
             <File>
               <FileName>peripheral.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\peripheral.c</FilePath>
+              <FilePath>..\Config\peripheral.c</FilePath>
+            </File>
+            <File>
+              <FileName>common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Common\common.c</FilePath>
+            </File>
+            <File>
+              <FileName>ADCS_Surrey.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ADCS_Surrey.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -538,7 +543,7 @@
             <File>
               <FileName>system_stm32f4xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Common\system_stm32f4xx.c</FilePath>
+              <FilePath>..\Config\system_stm32f4xx.c</FilePath>
             </File>
           </Files>
         </Group>
