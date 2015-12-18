@@ -21,6 +21,8 @@
 #include "task.h"
 #include "queue.h"
 
+#include "common.h"
+
 #include "Environment.h"
 
 #define repeat
@@ -61,7 +63,6 @@ static void MSC_Application(void);
 static void Error_Handler(void);
 
 /* import function*/
-extern void prvNewPrintString (const uint8_t *pcString, const uint8_t size);
 
 void submain_Environment(void)
 {

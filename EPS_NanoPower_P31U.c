@@ -22,6 +22,7 @@
 #include "queue.h"
 
 #include "peripheral.h"
+#include "common.h"
 
 #include "EPS_NanoPower_P31U.h"
 #include "Environment.h"
@@ -115,7 +116,6 @@ static void Initial_Register(void);
 static void Update_Register(void *argument);
 static void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength);
 
-extern void prvNewPrintString (const uint8_t *pcString, const uint8_t size);
 
 
 /************variable in environment*************************/

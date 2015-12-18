@@ -1,4 +1,5 @@
 #include "peripheral.h"
+#include "common.h"
 #include "main.h"
 
 
@@ -11,9 +12,6 @@ I2C_HandleTypeDef I2CxHandle_2;
 
 /* Receive New CMD flag */
 uint8_t priI2Cx_2_NewCommand =0;
-
-
-extern void prvNewPrintString (const uint8_t *pcString, const uint8_t size);
 
 static void Error_Handler(void);
 

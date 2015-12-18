@@ -32,10 +32,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "FreeRTOS.h"
-#include "semphr.h"
 #include "task.h"
 
 #include "peripheral.h"
+#include "common.h"
 
 /*module*/
 #include "EPS_NanoPower_P31U.h"
@@ -47,17 +47,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 extern I2C_HandleTypeDef I2CxHandle_2;
-extern UART_HandleTypeDef UartHandle;
-/* UART Semaphore*/
-xSemaphoreHandle uart_lock = NULL;
-
-/* Buffer used for UART and I2c reception */
-//uint8_t aRxBuffer[RXBUFFERSIZE];
-uint16_t hTxNumData = 0, hRxNumData = 0;
-uint8_t bTransferRequest = 0;
-
-/* Private function prototypes -----------------------------------------------*/
-void prvNewPrintString (const uint8_t *pcString, const uint8_t size);
 
 static void SystemClock_Config(void);
 //static void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength);
@@ -90,8 +79,7 @@ int main(void)
     
   Init_Peripheral();
       
-  /*Before */
-  uart_lock = xSemaphoreCreateMutex();
+  Init_common();
   
     /* Thread USBtoGO*/
   submain_Environment();
@@ -167,13 +155,6 @@ static void SystemClock_Config(void)
   {
     Error_Handler();
   }
-}
-
-void prvNewPrintString (const uint8_t *pcString, const uint8_t size)
-{
-    xSemaphoreTake(uart_lock, 10 * configTICK_RATE_HZ);
-    HAL_UART_Transmit(&UartHandle, (uint8_t *)pcString, size, 1000);
-    xSemaphoreGive(uart_lock);
 }
 
 
