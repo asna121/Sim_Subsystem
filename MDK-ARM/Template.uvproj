@@ -435,6 +435,11 @@
               <FileType>1</FileType>
               <FilePath>..\Common\usbh_conf.c</FilePath>
             </File>
+            <File>
+              <FileName>peripheral.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\peripheral.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
