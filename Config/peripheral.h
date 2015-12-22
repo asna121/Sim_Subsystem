@@ -69,8 +69,6 @@
 
 #define I2C_2_ADDRESS        0x04
  
-#endif /* __PERIPHERAL_H */
- 
  /*Exported variable -------------------------------------------------------  */
 
 extern I2C_HandleTypeDef I2CxHandle_2;
@@ -80,3 +78,6 @@ extern uint8_t priI2Cx_2_NewCommand;
 /* Exported functions ------------------------------------------------------- */
 
 extern void Init_Peripheral(void);
+
+
+#endif /* __PERIPHERAL_H */

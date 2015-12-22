@@ -62,10 +62,6 @@ typedef struct ADCS_ESTIMATED_ANGULAR_RATES {
 /* FreeRTOS */
 xTaskHandle I2CThreadHandle_2;
 
-
-extern xQueueHandle xQueue_EPS;
-//extern xQueueHandle xQueue_ADCS;
-
 /* UART handler declaration */
 extern UART_HandleTypeDef UartHandle;
 
@@ -79,7 +75,7 @@ static adcs_estimated_angular_rates angular_test;
 static void I2C_2_Slave_Mode(void *argument);
 static void Initial_Register(void);
 static void Update_Register(void *argument);
-static void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength);
+//static void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength);
 
 
 
@@ -197,9 +193,8 @@ static void Initial_Register(void)
 static void Update_Register(void *argument)
 {
     /* for the test */    
-    uint8_t *output_test = "popout\n";
-		
 	portTickType xLastWakeTime;
+    uint8_t buff[6] ={0,0,0,0,0,0};
 	
 	portBASE_TYPE xStatus;
     
@@ -213,14 +208,14 @@ static void Update_Register(void *argument)
     for(;;)
 	{
         /* for Queue Test */
-        if(xQueue_EPS!=0)
+        if(xQueue_ADCS!=0)
         {
-                if(uxQueueMessagesWaiting(xQueue_EPS) != 0)
+                if(uxQueueMessagesWaiting(xQueue_ADCS) != 0)
                 {
                     //prvNewPrintString("Hey",3);
                     //prvNewPrintString(output_test,7);
     
-                    xStatus = xQueueReceive(xQueue_EPS, &temp_queue_data ,0);
+                    xStatus = xQueueReceive(xQueue_ADCS, &temp_queue_data ,0);
                     if(xStatus == pdPASS)
                     {
                         //prvNewPrintString("Success ",8);
@@ -228,22 +223,35 @@ static void Update_Register(void *argument)
                         
                         switch(temp_queue_data.refRegister)
                         {
-                            case ref_envEPS_Battery_Voltage:
+                            case ref_envADCS_Estimated_Angular_X:
                     
                             temp_int = (type_envADCS_Estimated_Angular *)temp_queue_data.ptrRegister;
-                            *temp_int = 0X1234;
-                            /*get register value from Queue*/
 
+                            /*Set register value from Queue*/
                             angular_test.x_rate = *temp_int;
                             break;
+                            // case ref_envADCS_Estimated_Angular_Y:
+                    
+                            // temp_int = (type_envADCS_Estimated_Angular *)temp_queue_data.ptrRegister;
+
+                            // /*Set register value from Queue*/
+                            // angular_test.y_rate = *temp_int;
+                            // break;
+                            // case ref_envADCS_Estimated_Angular_Z:
+                    
+                            // temp_int = (type_envADCS_Estimated_Angular *)temp_queue_data.ptrRegister;
+
+                            // /*Set register value from Queue*/
+                            // angular_test.z_rate = *temp_int;
+                            // break;
                                       
                             default:
                             prvNewPrintString("Something Wrong",15); 
                         }
                 
                     /* Print to Screen*/
-                    //sprintf (buff, "%d", *temp_int);
-                    //prvNewPrintString(buff,6);
+                    sprintf (buff, "%d", *temp_int);
+                    prvNewPrintString(buff,6);
                 
                     free(temp_int);
                     }
@@ -262,7 +270,7 @@ static void Update_Register(void *argument)
 
 			
 		//vTaskDelayUntil( &xLastWakeTime, (1000/portTICK_RATE_MS) );
-        //prvNewPrintString(output_test,7);
+        //prvNewPrintString("popout\n",7);
             
         vTaskDelayUntil( &xLastWakeTime, 1000 );
 	}
@@ -275,12 +283,12 @@ static void Update_Register(void *argument)
   * @param  BufferLength: buffer's length
   * @retval None
   */
-static void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength)
-{
-  while (BufferLength--)
-  {
-    *pBuffer = 0;
-
-    pBuffer++;
-  }
-}
+//static void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength)
+//{
+//  while (BufferLength--)
+//  {
+//    *pBuffer = 0;
+//
+//    pBuffer++;
+// }
+//}
