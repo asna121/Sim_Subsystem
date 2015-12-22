@@ -30,6 +30,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f4xx_it.h"
+#include "peripheral.h"
 //#include "main.h"
 //#include "cmsis_os.h"
 
@@ -39,11 +40,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 extern HCD_HandleTypeDef hhcd;
-/* I2C handler declared in "main.c" file */
-extern I2C_HandleTypeDef I2CxHandle_1;
-extern I2C_HandleTypeDef I2CxHandle_2;
-
-extern UART_HandleTypeDef UartHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 

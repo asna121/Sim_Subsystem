@@ -72,10 +72,11 @@
 #endif /* __PERIPHERAL_H */
  
  /*Exported variable -------------------------------------------------------  */
- 
+
+extern I2C_HandleTypeDef I2CxHandle_2;
+extern UART_HandleTypeDef UartHandle;
+
 extern uint8_t priI2Cx_2_NewCommand;
- 
- 
 /* Exported functions ------------------------------------------------------- */
 
 extern void Init_Peripheral(void);

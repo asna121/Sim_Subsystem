@@ -3,13 +3,12 @@
 #include "semphr.h"
 
 #include "common.h"
+#include "peripheral.h"
 
 
 
 /* UART Semaphore*/
 xSemaphoreHandle uart_lock = NULL;
-
-extern UART_HandleTypeDef UartHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 void prvNewPrintString (const uint8_t *pcString, const uint8_t size);

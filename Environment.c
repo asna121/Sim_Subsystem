@@ -51,7 +51,6 @@ MSC_ApplicationTypeDef Appli_state = APPLICATION_IDLE;
 xQueueHandle xQueue_EPS;
     
 /* UART handler declaration */
-extern UART_HandleTypeDef UartHandle;
 extern xSemaphoreHandle uart_lock;
 
 
