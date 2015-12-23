@@ -37,7 +37,7 @@ uint8_t USBDISKPath[4];          /* USB Host logical drive path */
 
 FIL MyFile_ADCS_X;                   /* File object */
 FIL MyFile_ADCS_Y;                   /* File object */
-//FIL MyFile_ADCS_Z;                   /* File object */
+FIL MyFile_ADCS_Z;                   /* File object */
 
 USBH_HandleTypeDef hUSB_Host;	/* USB Host handle */
 
@@ -73,7 +73,7 @@ void submain_Environment(void)
 {
   
 	/* USB application task */
-	xTaskCreate(StartThread,"USER_Thread", 8 * configMINIMAL_STACK_SIZE, NULL, 0,NULL);
+	xTaskCreate(StartThread,"USER_Thread", 16 * configMINIMAL_STACK_SIZE, NULL, 0,NULL);
 
 }
 
@@ -209,34 +209,37 @@ static void MSC_Application(void)
             Error_Handler();
         }
         else
+            prvNewPrintString(" X_OK ",6);
+            
+        if(f_open(&MyFile_ADCS_Y, "ADCS_y", FA_READ) != FR_OK)
         {
-            Appli_state = APPLICATION_RUNNING;
+            /* 'STM32.TXT' file Open for read Error */
+            Error_Handler();
+        }
+        else
+            prvNewPrintString(" Y_OK ",6);
+        
+        if(f_open(&MyFile_ADCS_Z, "ADCS_Z", FA_READ) != FR_OK)
+        {
+            /* 'STM32.TXT' file Open for read Error */
+            Error_Handler();
+        }
+        else
+            prvNewPrintString(" Z_OK ",6);
+        
 
-            if(xQueue_ADCS==NULL)
-            {
-                /*Create Queue for each subsystem*/
-                xQueue_ADCS = xQueueCreate( Queue_Number , sizeof(xData) ); //for ADCS
-            }
+        Appli_state = APPLICATION_RUNNING;
+
+        if(xQueue_ADCS==NULL)
+        {
+            /*Create Queue for each subsystem*/
+            xQueue_ADCS = xQueueCreate( Queue_Number , sizeof(xData) ); //for ADCS
         }
 
-        // /* Open the text file object with read access */
-        // if(f_open(&MyFile_ADCS_Y, "ADCS_y", FA_READ) != FR_OK)
-        // {
-            // /* 'STM32.TXT' file Open for read Error */
-            // Error_Handler();
-        // }
-        // else
-        // {
-            // Appli_state = APPLICATION_RUNNING;
-
-            // if(xQueue_ADCS!=NULL)
-            // {
-                // /*Create Queue for each subsystem*/
-                // xQueue_ADCS = xQueueCreate( Queue_Size , sizeof(xData) ); //for ADCS
-            // }
-
-        // }
- 
+        
+        
+        
+        
         if(Appli_state == APPLICATION_RUNNING)
         {
             /* Check All Data Queue in Enivronment*/
@@ -257,11 +260,15 @@ static void Check_Data_Queue(void *argument)
     portBASE_TYPE xStatus;
     
     
-    uint32_t bytesread;                     /* File read counts */
-    
+    uint32_t bytesread_1;                     /* File read counts */
+    uint32_t bytesread_2;                     /* File read counts */
+    uint32_t bytesread_3;                     /* File read counts */     
+
     uint8_t i = 0;
     
-    uint8_t rtext[100];                                   /* File read buffer */   
+    uint8_t rtext_1[50];                                   /* File read buffer */   
+    uint8_t rtext_2[50];                                   /* File read buffer */  
+    uint8_t rtext_3[50];                                   /* File read buffer */       
     
     xData test1;
     xData_ADCS_Package* temp_package = NULL;
@@ -285,37 +292,63 @@ static void Check_Data_Queue(void *argument)
             
             if(uxQueueMessagesWaiting(xQueue_ADCS) <= (Queue_Number-5))
             {
-                 /* Read data from the text file */
-                f_read(&MyFile_ADCS_X, rtext, sizeof(xData_ADCS_Package)*5, (void *)&bytesread);   
-                
-                for(i=0;i<(bytesread/sizeof(xData_ADCS_Package));i++)
+                /* Read data from the text file */
+                f_read(&MyFile_ADCS_X, rtext_1, size_fileADCS_Estimated_Angular_X*5, (void *)&bytesread_1);
+                if((bytesread_1/size_fileADCS_Estimated_Angular_X)!=5)
+                {
+                    //prvNewPrintString("\n",1);
+                    
+                    #ifdef repeat
+                    f_rewind(&MyFile_ADCS_X);
+                    continue;
+                    #endif
+                    //not finished yet
+                }
+                /* Read data from the text file */
+                f_read(&MyFile_ADCS_Y, rtext_2, size_fileADCS_Estimated_Angular_Y*5, (void *)&bytesread_2);
+                if((bytesread_2/size_fileADCS_Estimated_Angular_Y)!=5)
+                {
+                    //prvNewPrintString("\n",1);
+                    
+                    #ifdef repeat
+                    f_rewind(&MyFile_ADCS_Y);
+                    continue;
+                    #endif
+                    //not finished yet
+                }
+                /* Read data from the text file */
+                f_read(&MyFile_ADCS_Z, rtext_3, size_fileADCS_Estimated_Angular_Z*5, (void *)&bytesread_3);
+                if((bytesread_3/size_fileADCS_Estimated_Angular_Z)!=5)
+                {
+                    //prvNewPrintString("\n",1);
+                    
+                    #ifdef repeat
+                    f_rewind(&MyFile_ADCS_Z);
+                    continue;
+                    #endif
+                    //not finished yet
+                }
+
+                for(i=0;i<5;i++)
                 {
                     //創造空間 大小為次系統的Package
                     temp_package = (xData_ADCS_Package *)malloc(sizeof( xData_ADCS_Package ));
             
                     //給值
-                    /* for the test */
-                    (*temp_package).envADCS_Estimated_Angular_X = ((rtext[i*2] & 0xff) << 8) | (rtext[i*2+1] & 0xff);
-            
+                    (*temp_package).envADCS_Estimated_Angular_X = ((rtext_1[i*2] & 0xff) << 8) | (rtext_1[i*2+1] & 0xff);
+                    (*temp_package).envADCS_Estimated_Angular_Y = ((rtext_2[i*2] & 0xff) << 8) | (rtext_2[i*2+1] & 0xff);
+                    (*temp_package).envADCS_Estimated_Angular_Z = ((rtext_3[i*2] & 0xff) << 8) | (rtext_3[i*2+1] & 0xff);
+                    
                     //複製到struct中的成員
-                    test1.refRegister = 0x0000;
+                    test1.refRegister = 0x0000; //make descion later, delete or not delete
                     test1.ptrRegister = (void *)temp_package;
         
                     //buffer, sizeof(long)
                     xStatus = xQueueSendToBack(xQueue_ADCS, &test1 ,0);
-
+    
                     /* Print to Screen*/
+                }
 
-                }
-                #ifdef repeat
-                if((bytesread/sizeof(xData_ADCS_Package))!=5)
-                {
-                    prvNewPrintString("\n",1);
-                    
-                    f_rewind(&MyFile_ADCS_X);
-                }
-                #endif
-                
             }
                 
         }
@@ -323,6 +356,8 @@ static void Check_Data_Queue(void *argument)
         { 
             /* Close the open text file */
             f_close(&MyFile_ADCS_X);
+            f_close(&MyFile_ADCS_Y);
+            f_close(&MyFile_ADCS_Z);
         }
         vTaskDelayUntil( &xLastWakeTime, 250 );        
     }

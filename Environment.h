@@ -25,8 +25,8 @@ typedef struct
 typedef struct
 {
     uint16_t envADCS_Estimated_Angular_X;
-    //uint16_t envADCS_Estimated_Angular_Y;
-    //uint16_t envADCS_Estimated_Angular_Z;
+    uint16_t envADCS_Estimated_Angular_Y;
+    uint16_t envADCS_Estimated_Angular_Z;
 
 }xData_ADCS_Package;
 #pragma pack(pop)
@@ -39,10 +39,12 @@ extern void submain_Environment(void);
 
 #define Queue_Number  10
 
-// /*File Name*/
+/*File Name*/
 
-
-
+/*File Item Size*/
+#define size_fileADCS_Estimated_Angular_X 2
+#define size_fileADCS_Estimated_Angular_Y 2
+#define size_fileADCS_Estimated_Angular_Z 2
 // /*EPS Queue*/
 // #define ref_envEPS_Battery_Voltage  (0x0100)
 

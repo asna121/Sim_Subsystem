@@ -226,9 +226,10 @@ static void Update_Register(void *argument)
 
                     /*Set register value from Queue*/
                     angular_test.x_rate = (*temp_package).envADCS_Estimated_Angular_X;
-                    
+                    angular_test.y_rate = (*temp_package).envADCS_Estimated_Angular_Y;
+                    angular_test.z_rate = (*temp_package).envADCS_Estimated_Angular_Z;
                     /* Print to Screen*/
-                    sprintf (buff, "%d", angular_test.x_rate);
+                    sprintf (buff, "%d", angular_test.y_rate);
                     prvNewPrintString(buff,6);
                 
                     free(temp_package);
