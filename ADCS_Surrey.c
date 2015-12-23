@@ -195,11 +195,15 @@ static void Update_Register(void *argument)
     /* for the test */    
 	portTickType xLastWakeTime;
     uint8_t buff[6] ={0,0,0,0,0,0};
+    
+    //uint8_t period = 0;
 	
 	portBASE_TYPE xStatus;
     
     xData temp_queue_data;
-    uint16_t* temp_int = NULL;
+    //uint16_t* temp_int = NULL;
+    
+    xData_ADCS_Package* temp_package = NULL;
 			
 	//prvNewPrintString("Hey",3);
 	xLastWakeTime = xTaskGetTickCount();
@@ -210,61 +214,34 @@ static void Update_Register(void *argument)
         /* for Queue Test */
         if(xQueue_ADCS!=0)
         {
-                if(uxQueueMessagesWaiting(xQueue_ADCS) != 0)
-                {
-                    //prvNewPrintString("Hey",3);
-                    //prvNewPrintString(output_test,7);
+            if(uxQueueMessagesWaiting(xQueue_ADCS) != 0)
+            {
     
-                    xStatus = xQueueReceive(xQueue_ADCS, &temp_queue_data ,0);
-                    if(xStatus == pdPASS)
-                    {
-                        //prvNewPrintString("Success ",8);
-                    temp_int = temp_queue_data.ptrRegister;
-                        
-                        switch(temp_queue_data.refRegister)
-                        {
-                            case ref_envADCS_Estimated_Angular_X:
+                xStatus = xQueueReceive(xQueue_ADCS, &temp_queue_data ,0);
+                if(xStatus == pdPASS)
+                {
+                    //prvNewPrintString("Success ",8);
                     
-                            temp_int = (type_envADCS_Estimated_Angular *)temp_queue_data.ptrRegister;
+                    temp_package = (xData_ADCS_Package *)temp_queue_data.ptrRegister;
 
-                            /*Set register value from Queue*/
-                            angular_test.x_rate = *temp_int;
-                            break;
-                            // case ref_envADCS_Estimated_Angular_Y:
+                    /*Set register value from Queue*/
+                    angular_test.x_rate = (*temp_package).envADCS_Estimated_Angular_X;
                     
-                            // temp_int = (type_envADCS_Estimated_Angular *)temp_queue_data.ptrRegister;
-
-                            // /*Set register value from Queue*/
-                            // angular_test.y_rate = *temp_int;
-                            // break;
-                            // case ref_envADCS_Estimated_Angular_Z:
-                    
-                            // temp_int = (type_envADCS_Estimated_Angular *)temp_queue_data.ptrRegister;
-
-                            // /*Set register value from Queue*/
-                            // angular_test.z_rate = *temp_int;
-                            // break;
-                                      
-                            default:
-                            prvNewPrintString("Something Wrong",15); 
-                        }
-                
                     /* Print to Screen*/
-                    sprintf (buff, "%d", *temp_int);
+                    sprintf (buff, "%d", angular_test.x_rate);
                     prvNewPrintString(buff,6);
                 
-                    free(temp_int);
-                    }
-                    else
-                        prvNewPrintString("Fail",4);
-                    
-                    //vTaskDelayUntil( &xLastWakeTime, 1000 );
+                    free(temp_package);
                 }
                 else
-                {
-                    prvNewPrintString("Empty ",6);
-                    break;
-                }
+                    prvNewPrintString("Fail",4);
+
+            }
+            else
+            {
+                prvNewPrintString("Empty ",6);
+                break;
+            }
 
         }
 
@@ -273,6 +250,12 @@ static void Update_Register(void *argument)
         //prvNewPrintString("popout\n",7);
             
         vTaskDelayUntil( &xLastWakeTime, 1000 );
+        
+        //period = (++period)%60;
+        
+        /* Print to Screen*/
+        //sprintf (buff, "%02d", period);
+        //prvNewPrintString(buff,2);
 	}
 }
   

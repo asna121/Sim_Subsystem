@@ -215,7 +215,7 @@ static void MSC_Application(void)
             if(xQueue_ADCS==NULL)
             {
                 /*Create Queue for each subsystem*/
-                xQueue_ADCS = xQueueCreate( Queue_Size , sizeof(xData) ); //for ADCS
+                xQueue_ADCS = xQueueCreate( Queue_Number , sizeof(xData) ); //for ADCS
             }
         }
 
@@ -249,11 +249,9 @@ static void MSC_Application(void)
     //FATFS_UnLinkDriver((char *)USBDISKPath);
 }
 
-
+//週期為1秒
 static void Check_Data_Queue(void *argument)
 {
-    //uint16_t temp[17] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
-    uint8_t i = 0;
     portTickType xLastWakeTime;
 
     portBASE_TYPE xStatus;
@@ -261,100 +259,47 @@ static void Check_Data_Queue(void *argument)
     
     uint32_t bytesread;                     /* File read counts */
     
-    xData test1;
-     uint8_t rtext[100];                                   /* File read buffer */   
+    uint8_t i = 0;
     
+    uint8_t rtext[100];                                   /* File read buffer */   
+    
+    xData test1;
+    xData_ADCS_Package* temp_package = NULL;
     
     /*for test*/
-    uint16_t* temp_int = NULL;
+    //uint16_t temp[17] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
+    //uint16_t* temp_int = NULL;
     
     //uint16_t* Pri_int = NULL;
     
     /*for print screen*/
 	//uint8_t buff[6] ={0,0,0,0,0,0};
-    
 
     
-	  
 	xLastWakeTime = xTaskGetTickCount();
-    
-    prvNewPrintString("Check Data Queue\n",18);
-    
-    Appli_state = APPLICATION_RUNNING;
     
     for(;;)
     {
         if(Appli_state == APPLICATION_RUNNING)
         {
-           // if(uxQueueMessagesWaiting(xQueue_EPS) <= (Queue_Size-5))
-            // {
-                 // /* Read data from the text file */
-                // f_read(&MyFile_EPS, rtext, sizeof(type_envEPS_Battery_Voltage)*5, (void *)&bytesread);   
             
-                // //prvNewPrintString("Not Enough ",11);
-                
-                // //sprintf (buff, "%d", bytesread/sizeof(type_envEPS_Battery_Voltage));
-                // //prvNewPrintString(buff,6);
-                
-                // for(i=0;i<(bytesread/sizeof(type_envEPS_Battery_Voltage));i++)
-                // {
-                    // //創造空間 register相應的空間大小
-                    // temp_int = (type_envEPS_Battery_Voltage *)malloc(sizeof( type_envEPS_Battery_Voltage ));
-            
-                    // //給值
-                    // /* for the test */
-                    // //*temp_int = temp[i++%17];
-                    // *temp_int = ((rtext[i*2] & 0xff) << 8) | (rtext[i*2+1] & 0xff);
-                    
-                    // sprintf (buff, "%d", *temp_int);
-                    // prvNewPrintString(buff,6);
-            
-                    // //複製到struct中的成員
-                    // test1.refRegister = ref_envEPS_Battery_Voltage;
-                    // test1.ptrRegister = (void *)temp_int;
-        
-                    // //buffer, sizeof(long)
-                    // xStatus = xQueueSendToBack(xQueue_EPS, &test1 ,0);
-
-                    // /* Print to Screen*/
-
-                // }
-                // #ifdef repeat
-                // if((bytesread/sizeof(type_envEPS_Battery_Voltage))!=5)
-                // {
-                    // prvNewPrintString("\n",1);
-                    
-                    // f_rewind(&MyFile_EPS);
-                // }
-                // #endif
-            // }
-            // else
-            // { 
-                // /* Close the open text file */
-                // f_close(&MyFile_EPS);
-            // }
-            
-            if(uxQueueMessagesWaiting(xQueue_ADCS) <= (Queue_Size-5))
+            if(uxQueueMessagesWaiting(xQueue_ADCS) <= (Queue_Number-5))
             {
                  /* Read data from the text file */
-                f_read(&MyFile_ADCS_X, rtext, sizeof(type_envADCS_Estimated_Angular)*5, (void *)&bytesread);   
+                f_read(&MyFile_ADCS_X, rtext, sizeof(xData_ADCS_Package)*5, (void *)&bytesread);   
                 
-                for(i=0;i<(bytesread/sizeof(type_envADCS_Estimated_Angular));i++)
+                for(i=0;i<(bytesread/sizeof(xData_ADCS_Package));i++)
                 {
-                    //創造空間 register相應的空間大小
-                    temp_int = (type_envADCS_Estimated_Angular *)malloc(sizeof( type_envADCS_Estimated_Angular ));
+                    //創造空間 大小為次系統的Package
+                    temp_package = (xData_ADCS_Package *)malloc(sizeof( xData_ADCS_Package ));
             
                     //給值
                     /* for the test */
-                    //*temp_int = temp[i++%17];
-                    *temp_int = ((rtext[i*2] & 0xff) << 8) | (rtext[i*2+1] & 0xff);
-                    
-                    //sprintf (buff, "%d", *temp_int);
-                    //prvNewPrintString(buff,6);
+                    (*temp_package).envADCS_Estimated_Angular_X = ((rtext[i*2] & 0xff) << 8) | (rtext[i*2+1] & 0xff);
             
                     //複製到struct中的成員
-                    test1.refRegister = ref_envADCS_Estimated_Angular_X;
-                    test1.ptrRegister = (void *)temp_int;
+                    test1.refRegister = 0x0000;
+                    test1.ptrRegister = (void *)temp_package;
         
                     //buffer, sizeof(long)
                     xStatus = xQueueSendToBack(xQueue_ADCS, &test1 ,0);
@@ -363,7 +308,7 @@ static void Check_Data_Queue(void *argument)
 
                 }
                 #ifdef repeat
-                if((bytesread/sizeof(type_envADCS_Estimated_Angular))!=5)
+                if((bytesread/sizeof(xData_ADCS_Package))!=5)
                 {
                     prvNewPrintString("\n",1);
                     
@@ -379,52 +324,6 @@ static void Check_Data_Queue(void *argument)
             /* Close the open text file */
             f_close(&MyFile_ADCS_X);
         }
-            
-            
-            // if(uxQueueMessagesWaiting(xQueue_ADCS) <= (Queue_Size-5))
-            // {
-                 // /* Read data from the text file */
-                // f_read(&MyFile_ADCS_Y, rtext, sizeof(type_envADCS_Estimated_Angular)*5, (void *)&bytesread);   
-                
-                // for(i=0;i<(bytesread/sizeof(type_envADCS_Estimated_Angular));i++)
-                // {
-                    // //創造空間 register相應的空間大小
-                    // temp_int = (type_envADCS_Estimated_Angular *)malloc(sizeof( type_envADCS_Estimated_Angular ));
-            
-                    // //給值
-                    // /* for the test */
-                    // *temp_int = ((rtext[i*2] & 0xff) << 8) | (rtext[i*2+1] & 0xff);
-                    
-                    // //sprintf (buff, "%d", *temp_int);
-                    // //prvNewPrintString(buff,6);
-            
-                    // //複製到struct中的成員
-                    // test1.refRegister = ref_envADCS_Estimated_Angular_Y;
-                    // test1.ptrRegister = (void *)temp_int;
-        
-                    // //buffer, sizeof(long)
-                    // xStatus = xQueueSendToBack(xQueue_ADCS, &test1 ,0);
-
-                    // /* Print to Screen*/
-
-                // }
-                // #ifdef repeat
-                // if((bytesread/sizeof(type_envADCS_Estimated_Angular))!=5)
-                // {
-                    // prvNewPrintString("\n",1);
-                    
-                    // f_rewind(&MyFile_ADCS_Y);
-                // }
-                // #endif
-            // }
-            // else
-            // { 
-                // /* Close the open text file */
-                // f_close(&MyFile_ADCS_Y);
-            // }
-
-        
-        //prvNewPrintString("putin\n",6);
         vTaskDelayUntil( &xLastWakeTime, 250 );        
     }
     
