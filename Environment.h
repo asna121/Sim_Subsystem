@@ -37,7 +37,7 @@ typedef struct
 //extern uint16_t deleteQueue_uint16(QUEUE_uint16 *q);
 extern void submain_Environment(void);
 
-#define Queue_Number  10
+#define Queue_Number  30
 
 /*File Name*/
 

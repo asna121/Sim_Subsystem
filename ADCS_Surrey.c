@@ -228,11 +228,12 @@ static void Update_Register(void *argument)
                     angular_test.x_rate = (*temp_package).envADCS_Estimated_Angular_X;
                     angular_test.y_rate = (*temp_package).envADCS_Estimated_Angular_Y;
                     angular_test.z_rate = (*temp_package).envADCS_Estimated_Angular_Z;
+                    
                     /* Print to Screen*/
-                    sprintf (buff, "%d", angular_test.y_rate);
-                    prvNewPrintString(buff,6);
+                    //sprintf (buff, "%d", angular_test.y_rate);
+                    //prvNewPrintString(buff,6);
                 
-                    free(temp_package);
+                    vPortFree(temp_package);
                 }
                 else
                     prvNewPrintString("Fail",4);

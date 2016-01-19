@@ -203,7 +203,7 @@ static void MSC_Application(void)
         // }
         
         /* Open the text file object with read access */
-        if(f_open(&MyFile_ADCS_X, "ADCS_x", FA_READ) != FR_OK)
+        if(f_open(&MyFile_ADCS_X, "ADCS_wx", FA_READ) != FR_OK)
         {
             /* 'STM32.TXT' file Open for read Error */
             Error_Handler();
@@ -211,7 +211,7 @@ static void MSC_Application(void)
         else
             prvNewPrintString(" X_OK ",6);
             
-        if(f_open(&MyFile_ADCS_Y, "ADCS_y", FA_READ) != FR_OK)
+        if(f_open(&MyFile_ADCS_Y, "ADCS_wy", FA_READ) != FR_OK)
         {
             /* 'STM32.TXT' file Open for read Error */
             Error_Handler();
@@ -219,7 +219,7 @@ static void MSC_Application(void)
         else
             prvNewPrintString(" Y_OK ",6);
         
-        if(f_open(&MyFile_ADCS_Z, "ADCS_Z", FA_READ) != FR_OK)
+        if(f_open(&MyFile_ADCS_Z, "ADCS_wZ", FA_READ) != FR_OK)
         {
             /* 'STM32.TXT' file Open for read Error */
             Error_Handler();
@@ -280,7 +280,7 @@ static void Check_Data_Queue(void *argument)
     //uint16_t* Pri_int = NULL;
     
     /*for print screen*/
-	//uint8_t buff[6] ={0,0,0,0,0,0};
+	uint8_t buff[6] ={0,0,0,0,0,0};
 
     
 	xLastWakeTime = xTaskGetTickCount();
@@ -332,7 +332,7 @@ static void Check_Data_Queue(void *argument)
                 for(i=0;i<5;i++)
                 {
                     //創造空間 大小為次系統的Package
-                    temp_package = (xData_ADCS_Package *)malloc(sizeof( xData_ADCS_Package ));
+                    temp_package = (xData_ADCS_Package *)pvPortMalloc(sizeof( xData_ADCS_Package ));
             
                     //給值
                     (*temp_package).envADCS_Estimated_Angular_X = ((rtext_1[i*2] & 0xff) << 8) | (rtext_1[i*2+1] & 0xff);
@@ -347,6 +347,8 @@ static void Check_Data_Queue(void *argument)
                     xStatus = xQueueSendToBack(xQueue_ADCS, &test1 ,0);
     
                     /* Print to Screen*/
+                    sprintf (buff, "%04X", (*temp_package).envADCS_Estimated_Angular_Z);
+                    prvNewPrintString(buff,6);
                 }
 
             }
