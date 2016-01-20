@@ -30,6 +30,8 @@
 
 
 /* Private typedef -----------------------------------------------------------*/
+
+/* This structure is based on Gomspace Protocol*/
 typedef struct{
 	
 uint8_t priCommand;
@@ -151,21 +153,19 @@ static void I2C_2_Slave_Mode(void *argument)
 	
 			switch(I2C_transfer_slave_2.priCommand)
 			{
-				case 0x92:
-					I2C_transfer_slave_2.priErrorcode = 0;
+				
+                /* Parts of ADCS state telemetry frame (ID 136), accessible through shorter telemetry requests*/
+                case 0x92://ID 146 Estimated Angular Rates
+					//I2C_transfer_slave_2.priErrorcode = 0;
 					//reply data
+
+					I2C_transfer_slave_2.priSizeofReply = 6;
 				
-					I2C_transfer_slave_2.priSizeofReply = 2+6;
-				
-					priTransferDataBuffer[0] = I2C_transfer_slave_2.priCommand;
-					priTransferDataBuffer[1] = I2C_transfer_slave_2.priErrorcode;
-					memcpy( (void *)(priTransferDataBuffer+2), (void *)&angular_test, 6);
+					memcpy( (void *)(priTransferDataBuffer), (void *)&angular_test, 6);
 				break;
                 default:
-                    priTransferDataBuffer[0] = 0xff;
-					priTransferDataBuffer[1] = 0xEE;
-                    memcpy( (void *)(priTransferDataBuffer+2), (void *)default_string, 18);
-                    
+                    /* send a default string to remind user*/
+                    memcpy( (void *)(priTransferDataBuffer), (void *)default_string, 18);
 			}
 		
 		}
@@ -193,19 +193,22 @@ static void Initial_Register(void)
 static void Update_Register(void *argument)
 {
     /* for the test */    
-	portTickType xLastWakeTime;
     uint8_t buff[6] ={0,0,0,0,0,0};
     
+    /* for period */
+    portTickType xLastWakeTime;
     //uint8_t period = 0;
 	
+    /* for queue */
 	portBASE_TYPE xStatus;
     
+    /*temp of xData*/
     xData temp_queue_data;
-    //uint16_t* temp_int = NULL;
     
-    xData_ADCS_Package* temp_package = NULL;
-			
-	//prvNewPrintString("Hey",3);
+    /*temp of subsystem data package, please ref to "Environment.h"*/
+    uint16_t temp_ref_package = 0;
+    xData_ADCS_Package_1* temp_package = NULL;
+    
 	xLastWakeTime = xTaskGetTickCount();
     prvNewPrintString("Update Reg\n",12);
 	
@@ -216,33 +219,45 @@ static void Update_Register(void *argument)
         {
             if(uxQueueMessagesWaiting(xQueue_ADCS) != 0)
             {
-    
-                xStatus = xQueueReceive(xQueue_ADCS, &temp_queue_data ,0);
-                if(xStatus == pdPASS)
-                {
-                    //prvNewPrintString("Success ",8);
-                    
-                    temp_package = (xData_ADCS_Package *)temp_queue_data.ptrRegister;
-
-                    /*Set register value from Queue*/
-                    angular_test.x_rate = (*temp_package).envADCS_Estimated_Angular_X;
-                    angular_test.y_rate = (*temp_package).envADCS_Estimated_Angular_Y;
-                    angular_test.z_rate = (*temp_package).envADCS_Estimated_Angular_Z;
-                    
-                    /* Print to Screen*/
-                    //sprintf (buff, "%d", angular_test.y_rate);
-                    //prvNewPrintString(buff,6);
+                /* Peek the ADCS Queue */
+                xStatus = xQueuePeek(xQueue_ADCS, &temp_queue_data ,0);
+                temp_ref_package = temp_queue_data.refPackage;
                 
-                    vPortFree(temp_package);
-                }
-                else
-                    prvNewPrintString("Fail",4);
+                switch (temp_ref_package)
+                {
+                    case ref_envADCS_Package_1:
+                        xStatus = xQueueReceive(xQueue_ADCS, &temp_queue_data ,0);
+                        
+                        if(xStatus == pdPASS)
+                        {
+                        //prvNewPrintString("Success ",8);
+                    
+                        temp_package = (xData_ADCS_Package_1 *)temp_queue_data.ptrPackage;
 
+                        /*Set register value from Queue*/
+                        angular_test.x_rate = (*temp_package).envADCS_Estimated_Angular_X;
+                        angular_test.y_rate = (*temp_package).envADCS_Estimated_Angular_Y;
+                        angular_test.z_rate = (*temp_package).envADCS_Estimated_Angular_Z;
+                    
+                        /* Print to Screen*/
+                        sprintf (buff, "%04X", angular_test.x_rate);
+                        prvNewPrintString(buff,6);
+                
+                        vPortFree(temp_package);
+                        }
+                        else
+                            prvNewPrintString("Fail",4);
+                        
+                        break;
+                    case ref_envADCS_Package_2:
+                        break;
+                    default:
+                        prvNewPrintString("Ref. Package Error ",19);
+                }
             }
             else
             {
-                prvNewPrintString("Empty ",6);
-                break;
+                prvNewPrintString("Queue Empty ",12);
             }
 
         }
@@ -250,14 +265,9 @@ static void Update_Register(void *argument)
 			
 		//vTaskDelayUntil( &xLastWakeTime, (1000/portTICK_RATE_MS) );
         //prvNewPrintString("popout\n",7);
-            
+        
+        /* Data Update Period*/
         vTaskDelayUntil( &xLastWakeTime, 1000 );
-        
-        //period = (++period)%60;
-        
-        /* Print to Screen*/
-        //sprintf (buff, "%02d", period);
-        //prvNewPrintString(buff,2);
 	}
 }
   

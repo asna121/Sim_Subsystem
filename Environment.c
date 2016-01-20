@@ -271,7 +271,7 @@ static void Check_Data_Queue(void *argument)
     uint8_t rtext_3[50];                                   /* File read buffer */       
     
     xData test1;
-    xData_ADCS_Package* temp_package = NULL;
+    xData_ADCS_Package_1* temp_package = NULL;
     
     /*for test*/
     //uint16_t temp[17] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17};
@@ -332,7 +332,7 @@ static void Check_Data_Queue(void *argument)
                 for(i=0;i<5;i++)
                 {
                     //創造空間 大小為次系統的Package
-                    temp_package = (xData_ADCS_Package *)pvPortMalloc(sizeof( xData_ADCS_Package ));
+                    temp_package = (xData_ADCS_Package_1 *)pvPortMalloc(sizeof( xData_ADCS_Package_1 ));
             
                     //給值
                     (*temp_package).envADCS_Estimated_Angular_X = ((rtext_1[i*2] & 0xff) << 8) | (rtext_1[i*2+1] & 0xff);
@@ -340,15 +340,15 @@ static void Check_Data_Queue(void *argument)
                     (*temp_package).envADCS_Estimated_Angular_Z = ((rtext_3[i*2] & 0xff) << 8) | (rtext_3[i*2+1] & 0xff);
                     
                     //複製到struct中的成員
-                    test1.refRegister = 0x0000; //make descion later, delete or not delete
-                    test1.ptrRegister = (void *)temp_package;
+                    test1.refPackage = ref_envADCS_Package_1;
+                    test1.ptrPackage = (void *)temp_package;
         
                     //buffer, sizeof(long)
                     xStatus = xQueueSendToBack(xQueue_ADCS, &test1 ,0);
     
                     /* Print to Screen*/
-                    sprintf (buff, "%04X", (*temp_package).envADCS_Estimated_Angular_Z);
-                    prvNewPrintString(buff,6);
+                    //sprintf (buff, "%04X", (*temp_package).envADCS_Estimated_Angular_Z);
+                    //prvNewPrintString(buff,6);
                 }
 
             }
