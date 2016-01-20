@@ -60,7 +60,7 @@ extern xSemaphoreHandle uart_lock;
 
 
 /* Private function prototypes -----------------------------------------------*/
-static void Check_Data_Queue(void *argument);
+static void Update_Data_in_Period(void *argument);
 static void StartThread(void *argument);
 static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
 static void MSC_Application(void);
@@ -243,7 +243,7 @@ static void MSC_Application(void)
         if(Appli_state == APPLICATION_RUNNING)
         {
             /* Check All Data Queue in Enivronment*/
-            xTaskCreate(Check_Data_Queue,"Data Queue Check", configMINIMAL_STACK_SIZE, NULL, 1,NULL); //Caution
+            xTaskCreate(Update_Data_in_Period,"Data Queue Check", configMINIMAL_STACK_SIZE, NULL, 1,NULL); //Caution
         }
     
     }
@@ -252,8 +252,23 @@ static void MSC_Application(void)
     //FATFS_UnLinkDriver((char *)USBDISKPath);
 }
 
+static void readfile_in_disk(FIL* myfile, uint8_t* temp_rtext, uint8_t size_of_item,  uint32_t* temp_byteread)
+{
+    /* Read data from the text file */
+    f_read(myfile, temp_rtext, size_of_item, (void *)temp_byteread);
+    
+    if(((*temp_byteread)/size_of_item)!=5)
+    {
+     //prvNewPrintString("\n",1);
+    #ifdef repeat
+    f_rewind(myfile);
+    #endif
+    }
+
+}
+
 //週期為1秒
-static void Check_Data_Queue(void *argument)
+static void Update_Data_in_Period(void *argument)
 {
     portTickType xLastWakeTime;
 
@@ -268,7 +283,7 @@ static void Check_Data_Queue(void *argument)
     
     uint8_t rtext_1[50];                                   /* File read buffer */   
     uint8_t rtext_2[50];                                   /* File read buffer */  
-    uint8_t rtext_3[50];                                   /* File read buffer */       
+    uint8_t rtext_3[50];                                   /* File read buffer */     
     
     xData test1;
     xData_ADCS_Package_1* temp_package = NULL;
@@ -287,72 +302,57 @@ static void Check_Data_Queue(void *argument)
     
     for(;;)
     {
+        /* data update period */
+        vTaskDelayUntil( &xLastWakeTime, 1000 );
+        
         if(Appli_state == APPLICATION_RUNNING)
         {
             
-            if(uxQueueMessagesWaiting(xQueue_ADCS) <= (Queue_Number-5))
+            /* if rtext is empty*/
+            if(i==0)
             {
                 /* Read data from the text file */
-                f_read(&MyFile_ADCS_X, rtext_1, size_fileADCS_Estimated_Angular_X*5, (void *)&bytesread_1);
-                if((bytesread_1/size_fileADCS_Estimated_Angular_X)!=5)
-                {
-                    //prvNewPrintString("\n",1);
-                    
-                    #ifdef repeat
-                    f_rewind(&MyFile_ADCS_X);
-                    continue;
-                    #endif
-                    //not finished yet
-                }
-                /* Read data from the text file */
-                f_read(&MyFile_ADCS_Y, rtext_2, size_fileADCS_Estimated_Angular_Y*5, (void *)&bytesread_2);
-                if((bytesread_2/size_fileADCS_Estimated_Angular_Y)!=5)
-                {
-                    //prvNewPrintString("\n",1);
-                    
-                    #ifdef repeat
-                    f_rewind(&MyFile_ADCS_Y);
-                    continue;
-                    #endif
-                    //not finished yet
-                }
-                /* Read data from the text file */
-                f_read(&MyFile_ADCS_Z, rtext_3, size_fileADCS_Estimated_Angular_Z*5, (void *)&bytesread_3);
-                if((bytesread_3/size_fileADCS_Estimated_Angular_Z)!=5)
-                {
-                    //prvNewPrintString("\n",1);
-                    
-                    #ifdef repeat
-                    f_rewind(&MyFile_ADCS_Z);
-                    continue;
-                    #endif
-                    //not finished yet
-                }
-
-                for(i=0;i<5;i++)
-                {
-                    //創造空間 大小為次系統的Package
-                    temp_package = (xData_ADCS_Package_1 *)pvPortMalloc(sizeof( xData_ADCS_Package_1 ));
-            
-                    //給值
-                    (*temp_package).envADCS_Estimated_Angular_X = ((rtext_1[i*2] & 0xff) << 8) | (rtext_1[i*2+1] & 0xff);
-                    (*temp_package).envADCS_Estimated_Angular_Y = ((rtext_2[i*2] & 0xff) << 8) | (rtext_2[i*2+1] & 0xff);
-                    (*temp_package).envADCS_Estimated_Angular_Z = ((rtext_3[i*2] & 0xff) << 8) | (rtext_3[i*2+1] & 0xff);
-                    
-                    //複製到struct中的成員
-                    test1.refPackage = ref_envADCS_Package_1;
-                    test1.ptrPackage = (void *)temp_package;
-        
-                    //buffer, sizeof(long)
-                    xStatus = xQueueSendToBack(xQueue_ADCS, &test1 ,0);
-    
-                    /* Print to Screen*/
-                    //sprintf (buff, "%04X", (*temp_package).envADCS_Estimated_Angular_Z);
-                    //prvNewPrintString(buff,6);
-                }
-
-            }
+                readfile_in_disk(&MyFile_ADCS_X, rtext_1, size_fileADCS_Estimated_Angular_X*5, &bytesread_1);
+                readfile_in_disk(&MyFile_ADCS_Y, rtext_2, size_fileADCS_Estimated_Angular_Y*5, &bytesread_2);
+                readfile_in_disk(&MyFile_ADCS_Z, rtext_3, size_fileADCS_Estimated_Angular_Z*5, &bytesread_3);
                 
+            }
+            
+            /*創造空間 大小為次系統的Package*/
+            temp_package = (xData_ADCS_Package_1 *)pvPortMalloc(sizeof( xData_ADCS_Package_1 ));
+            
+            /*給值*/
+            (*temp_package).envADCS_Estimated_Angular_X = ((rtext_1[i*2] & 0xff) << 8) | (rtext_1[i*2+1] & 0xff);
+            (*temp_package).envADCS_Estimated_Angular_Y = ((rtext_2[i*2] & 0xff) << 8) | (rtext_2[i*2+1] & 0xff);
+            (*temp_package).envADCS_Estimated_Angular_Z = ((rtext_3[i*2] & 0xff) << 8) | (rtext_3[i*2+1] & 0xff);
+                    
+            /*複製到struct中的成員*/
+            test1.refPackage = ref_envADCS_Package_1;
+            test1.ptrPackage = (void *)temp_package;
+        
+            //buffer, sizeof(long)
+            xStatus = xQueueSendToBack(xQueue_ADCS, &test1 ,0);
+            
+            /**  this area can be used for another subsystem's package which has the same period **/
+            /*創造空間 大小為次系統的Package*/
+            //temp_package = (xData_ADCS_Package_1 *)pvPortMalloc(sizeof( xData_ADCS_Package_1 ));
+            
+            /*給值*/
+            //(*temp_package).envADCS_Estimated_Angular_X = ((rtext_1[i*2] & 0xff) << 8) | (rtext_1[i*2+1] & 0xff);
+            //(*temp_package).envADCS_Estimated_Angular_Y = ((rtext_2[i*2] & 0xff) << 8) | (rtext_2[i*2+1] & 0xff);
+            //(*temp_package).envADCS_Estimated_Angular_Z = ((rtext_3[i*2] & 0xff) << 8) | (rtext_3[i*2+1] & 0xff);
+            
+            /*複製到struct中的成員*/
+            //test1.refPackage = ref_envADCS_Package_1;
+            //test1.ptrPackage = (void *)temp_package;
+        
+            //buffer, sizeof(long)
+            //xStatus = xQueueSendToBack(xQueue_ADCS, &test1 ,0);
+                       
+            /* Print to Screen*/
+            //sprintf (buff, "%04X", (*temp_package).envADCS_Estimated_Angular_Z);
+            //prvNewPrintString(buff,6);
+ 
         }
         else
         { 
@@ -361,7 +361,12 @@ static void Check_Data_Queue(void *argument)
             f_close(&MyFile_ADCS_Y);
             f_close(&MyFile_ADCS_Z);
         }
-        vTaskDelayUntil( &xLastWakeTime, 250 );        
+        
+        /*read index increase*/
+        i=(++i)%5;
+        
     }
     
 }
+
+

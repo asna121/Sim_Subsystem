@@ -217,7 +217,8 @@ static void Update_Register(void *argument)
         /* for Queue Test */
         if(xQueue_ADCS!=0)
         {
-            if(uxQueueMessagesWaiting(xQueue_ADCS) != 0)
+            //if(uxQueueMessagesWaiting(xQueue_ADCS) != 0)
+            while(uxQueueMessagesWaiting(xQueue_ADCS) != 0)
             {
                 /* Peek the ADCS Queue */
                 xStatus = xQueuePeek(xQueue_ADCS, &temp_queue_data ,0);
@@ -240,7 +241,7 @@ static void Update_Register(void *argument)
                         angular_test.z_rate = (*temp_package).envADCS_Estimated_Angular_Z;
                     
                         /* Print to Screen*/
-                        sprintf (buff, "%04X", angular_test.x_rate);
+                        sprintf (buff, "%04X", angular_test.y_rate);
                         prvNewPrintString(buff,6);
                 
                         vPortFree(temp_package);
@@ -249,15 +250,11 @@ static void Update_Register(void *argument)
                             prvNewPrintString("Fail",4);
                         
                         break;
-                    case ref_envADCS_Package_2:
-                        break;
+                    //case ref_envADCS_Package_2:
+                    //    break;
                     default:
                         prvNewPrintString("Ref. Package Error ",19);
                 }
-            }
-            else
-            {
-                prvNewPrintString("Queue Empty ",12);
             }
 
         }
@@ -267,7 +264,7 @@ static void Update_Register(void *argument)
         //prvNewPrintString("popout\n",7);
         
         /* Data Update Period*/
-        vTaskDelayUntil( &xLastWakeTime, 1000 );
+        vTaskDelayUntil( &xLastWakeTime, 10 );
 	}
 }
   

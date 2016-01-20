@@ -24,7 +24,8 @@ typedef struct
 #pragma pack(pop)
 
 /*
-There are differnet period of packge in the same subsystem.
+There are differnet subsytem with the same update period. so this system need
+a reference to know received package type.
 */
 
 /* ADCS Package 1 */
