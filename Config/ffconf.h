@@ -212,7 +212,7 @@
 /      function must be added to the project. */
 
 
-#define _FS_LOCK    3      /* 0:Disable or >=1:Enable */
+#define _FS_LOCK    4      /* 0:Disable or >=1:Enable */
 /* To enable file lock control feature, set _FS_LOCK to 1 or greater.
    The value defines how many files can be opened simultaneously. */
 

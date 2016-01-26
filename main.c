@@ -38,7 +38,7 @@
 #include "common.h"
 
 /*module*/
-#include "ADCS_Surrey.h"
+#include "INMS_IF_board.h"
 #include "Environment.h"
 
 /* Private typedef -----------------------------------------------------------*/
@@ -82,7 +82,7 @@ int main(void)
   submain_Environment();
   
     /* Thread I2C 2*/
-  submain_ADCS(&I2CxHandle_2);
+  submain_IFB(&I2CxHandle_2);
 	
   /* Start scheduler */
   vTaskStartScheduler();

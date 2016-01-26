@@ -67,7 +67,7 @@
 
 /* Definition for I2Cx's ADDRESS */
 
-#define I2C_2_ADDRESS        0x04
+#define I2C_2_ADDRESS        0xDA
  
  /*Exported variable -------------------------------------------------------  */
 

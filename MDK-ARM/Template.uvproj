@@ -362,7 +362,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F429xx,USE_STM32F429I_DISCO</Define>
               <Undefine></Undefine>
-              <IncludePath>..\;..\Config;..\Common;..\..\Package_STM32F4\Drivers\CMSIS\Device;..\..\Package_STM32F4\Drivers\CMSIS\Include;..\..\Package_STM32F4\Drivers\STM32F4xx_HAL_Driver\Inc;..\..\Package_STM32F4\Drivers\BSP\STM32F429I-Discovery;..\..\Package_STM32F4\Middlewares\FreeRTOS\Source\include;..\..\Package_STM32F4\Middlewares\FreeRTOS\Source\portable\RVDS\ARM_CM4F;..\..\Package_STM32F4\Middlewares\FatFs\src;..\..\Package_STM32F4\Middlewares\FatFs\src\drivers;..\..\Package_STM32F4\Middlewares\STM32_USB_Host_Library\Core\Inc;..\..\Package_STM32F4\Middlewares\STM32_USB_Host_Library\Class\MSC\Inc</IncludePath>
+              <IncludePath>..\;..\Config;..\Common;..\Module;..\..\Package_STM32F4\Drivers\CMSIS\Device;..\..\Package_STM32F4\Drivers\CMSIS\Include;..\..\Package_STM32F4\Drivers\STM32F4xx_HAL_Driver\Inc;..\..\Package_STM32F4\Drivers\BSP\STM32F429I-Discovery;..\..\Package_STM32F4\Middlewares\FreeRTOS\Source\include;..\..\Package_STM32F4\Middlewares\FreeRTOS\Source\portable\RVDS\ARM_CM4F;..\..\Package_STM32F4\Middlewares\FatFs\src;..\..\Package_STM32F4\Middlewares\FatFs\src\drivers;..\..\Package_STM32F4\Middlewares\STM32_USB_Host_Library\Core\Inc;..\..\Package_STM32F4\Middlewares\STM32_USB_Host_Library\Class\MSC\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -441,9 +441,9 @@
               <FilePath>..\Common\common.c</FilePath>
             </File>
             <File>
-              <FileName>ADCS_Surrey.c</FileName>
+              <FileName>INMS_IF_board.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\ADCS_Surrey.c</FilePath>
+              <FilePath>..\Module\INMS_IF_board.c</FilePath>
             </File>
           </Files>
         </Group>
