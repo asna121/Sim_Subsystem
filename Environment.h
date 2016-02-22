@@ -16,9 +16,9 @@
 
 /* Queue Handler of each Subsystem */
 
-//extern xQueueHandle xQueue_EPS;
+extern xQueueHandle xQueue_EPS;
 //extern xQueueHandle xQueue_ADCS;
-extern xQueueHandle xQueue_IFB;
+//extern xQueueHandle xQueue_IFB;
 
 /* submain of Environment*/
 extern void submain_Environment(void);
@@ -42,6 +42,13 @@ a reference to know received package type.
 
 Define Subsystem's Package send to Subsystem's Queue
 */
+/* EPS Package 1 */
+#pragma pack(push, 1)
+typedef struct
+{
+    uint16_t envEPS_Battery_Voltage;
+}xData_EPS_Package_1;
+#pragma pack(pop)
 
 /* ADCS Package 1 */
 // #pragma pack(push, 1)
@@ -66,16 +73,16 @@ Define Subsystem's Package send to Subsystem's Queue
 // #pragma pack(pop)
 
 /* IFB Package 1 */
-#pragma pack(push, 1)
-typedef struct
-{
-    uint16_t envIFB_5V_Current;
-    uint16_t envIFB_3_3V_Current;
-    uint16_t envIFB_INMS_Temp;
-    uint16_t envIFB_IFB_Temp;
+//#pragma pack(push, 1)
+//typedef struct
+//{
+//    uint16_t envIFB_5V_Current;
+//    uint16_t envIFB_3_3V_Current;
+//    uint16_t envIFB_INMS_Temp;
+//    uint16_t envIFB_IFB_Temp;
     
-}xData_IFB_Package_1;
-#pragma pack(pop)
+//}xData_IFB_Package_1;
+//#pragma pack(pop)
 
 /* Define -------------------------------------------------------------------*/
 
@@ -87,15 +94,15 @@ Define the reference number of package. These package data are transfered from
 environment to corresponding subsystem.
 */
 
-/*IFB Queue*/
-#define ref_envIFB_Package_1 (0x0301)
+/*EPS Queue*/
+#define ref_envEPS_Package_1 (0x0101)
 
 /*ADCS Queue*/
 #define ref_envADCS_Package_1  (0x0201)
 #define ref_envADCS_Package_2  (0x0202)
 
-/*EPS Queue*/
-#define ref_envEPS_Package_1 (0x0101)
+/*IFB Queue*/
+#define ref_envIFB_Package_1 (0x0301)
 
 /*
 Define the input file in the USB disk.
@@ -106,16 +113,18 @@ Define the input file in the USB disk.
 
 /**File Item Size**/
 
-/* IFB File Item Size*/
-#define size_fileIFB_5V_Current 2
-#define size_fileIFB_3_3V_Current 2
-#define size_fileIFB_INMS_Temp 2
-#define size_fileIFB_IFB_Temp 2
+/* EPS File Item Size*/
+#define size_fileEPS_Battery_Voltage 2
 
 /* ADCS File Item Size*/
 //#define size_fileADCS_Estimated_Angular_X 2
 //#define size_fileADCS_Estimated_Angular_Y 2
 //#define size_fileADCS_Estimated_Angular_Z 2
 
+/* IFB File Item Size*/
+//#define size_fileIFB_5V_Current 2
+//#define size_fileIFB_3_3V_Current 2
+//#define size_fileIFB_INMS_Temp 2
+//#define size_fileIFB_IFB_Temp 2
 
 #endif /* __ENVIRONMENT_H */

@@ -66,9 +66,10 @@
  #define I2Cx_2_ER_Priority										10
 
 /* Definition for I2Cx's ADDRESS */
-
-#define I2C_2_ADDRESS        0xDA
- 
+//EPS
+#define I2C_2_ADDRESS        0x04
+//IFB
+//#define I2C_2_ADDRESS        0xDA
  /*Exported variable -------------------------------------------------------  */
 
 extern I2C_HandleTypeDef I2CxHandle_2;

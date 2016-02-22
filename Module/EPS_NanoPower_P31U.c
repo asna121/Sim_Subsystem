@@ -40,50 +40,6 @@ uint8_t priSizeofReply;
 	
 } priI2C_WriteActionTypeDef;
 
-//for nanopower P31 v6.1
-#pragma pack(push, 1)
-typedef struct EPS_GET_HK {
-	uint16_t pv[3];		    //Photo-voltac input voltage [mV]
-	uint16_t pc;		    //Total photo current [mV]
-	uint16_t bv;		    //Battery voltage [mV]
-	uint16_t sc;		    //Total system current [mA]
-	int16_t  temp[4];	    //Temp. of boost coverters (1,2,3) and onboard battery [degC]
-	int16_t  batt_temp[2];  //External board battery temperatures [degC]
-	uint16_t latchup[6];    //Number of latch-ups on each output 5V and +3.3 channel
-                            //[5V1 5V2 5V3 3.3V1 3.3V2 3.3V3]
-	uint8_t reset;          //Cause of last EPS reset
-	uint16_t bootcount;     //Number of EPS reboots
-	uint16_t sw_errors;     //Number of errors in the EPS software
-	uint8_t  ppt_mode;      //0 = Hardware, 1 = MPPT, 2 = Fixed SW PPT
-	uint8_t  channel_status;//Mask of output channel status, 1=on, 0=off
-                            //MSB - [NC NC 3.3V3 3.3V2 3.3V1 5V3 5V2 5V1] - LSB
-} eps_get_hk;
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-typedef struct EPS_GET_VERSION {
-    uint8_t type[4];
-    uint8_t ver[5];
-    uint8_t date[12];
-    uint8_t time[9];
-}eps_get_version;
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-typedef struct EPS_SET_PV_VOLT {
-    uint16_t voltage1;
-    uint16_t voltage2;
-    uint16_t voltage3;
-}eps_set_pv_volt;
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-typedef struct EPS_SET_OUTPUT {
-    uint8_t output_byte;
-}eps_set_output;
-#pragma pack(pop)
-
-
 /* Private define ------------------------------------------------------------*/
 /* Buffer size of priTransferDataBuffer*/
 #define TRANSFERBUFFERSIZE 50
@@ -92,34 +48,27 @@ typedef struct EPS_SET_OUTPUT {
 /* FreeRTOS */
 xTaskHandle I2CThreadHandle_2;
 
-
-extern xQueueHandle xQueue_EPS;
-
-
 /* UART handler declaration */
 extern UART_HandleTypeDef UartHandle;
 
 /*I2C communication declaration*/
 priI2C_WriteActionTypeDef I2C_transfer_slave_2;
 
-/* register in module*/
+/************************** register in module**************************/
 static eps_get_hk hk_test;
 static eps_get_version version_test;
 
 static eps_set_pv_volt pv_volt_test;
 static eps_set_output output_test;
 
+/************variable in environment*************************/
+//static uint16_t envEPS_Battery_Voltage;
 
 /* Private function prototypes -----------------------------------------------*/
 static void I2C_2_Slave_Mode(void *argument);
 static void Initial_Register(void);
 static void Update_Register(void *argument);
 static void Flush_Buffer(uint8_t* pBuffer, uint16_t BufferLength);
-
-
-
-/************variable in environment*************************/
-static uint16_t envEPS_Battery_Voltage;
 
 
 void submain_EPS(I2C_HandleTypeDef *argument)
@@ -150,7 +99,7 @@ static void I2C_2_Slave_Mode(void *argument)
 	
     I2C_HandleTypeDef* I2CHandle;
 
-    uint8_t priTransferDataBuffer[50];
+    uint8_t priTransferDataBuffer[TRANSFERBUFFERSIZE];
     
     uint8_t* default_string = "012345678996543210";
 	
@@ -173,7 +122,6 @@ static void I2C_2_Slave_Mode(void *argument)
     while (HAL_I2C_GetState(I2CHandle) != HAL_I2C_STATE_READY)
     {
         vTaskDelay(1);
-				//prvNewPrintString("Chuck",5);
     }
 		
 		
@@ -185,9 +133,11 @@ static void I2C_2_Slave_Mode(void *argument)
 			I2C_transfer_slave_2.priCommand = priTransferDataBuffer[0];
 			I2C_transfer_slave_2.priRequestPtr = priTransferDataBuffer+1;
 		
-	
+/* the format of register output to master device. It can call interface format of subsystm */	
+			
 			switch(I2C_transfer_slave_2.priCommand)
 			{
+				/* Node 0x08*/
 				case 0x08:
 					I2C_transfer_slave_2.priErrorcode = 0;
 					//reply data
@@ -198,7 +148,8 @@ static void I2C_2_Slave_Mode(void *argument)
 					priTransferDataBuffer[1] = I2C_transfer_slave_2.priErrorcode;
 					memcpy( (void *)(priTransferDataBuffer+2), (void *)&hk_test, 43);
 				break;
-			
+				
+				/* Node 0x09*/
 				case 0x09:
 					output_test.output_byte = *(I2C_transfer_slave_2.priRequestPtr);
 			
@@ -208,10 +159,8 @@ static void I2C_2_Slave_Mode(void *argument)
 					/* Flush Tx/Rx buffers */
 					Flush_Buffer(priTransferDataBuffer,TRANSFERBUFFERSIZE);
 				break;
-                default:
-                    priTransferDataBuffer[0] = 0xff;
-					priTransferDataBuffer[1] = 0xEE;
-                    memcpy( (void *)(priTransferDataBuffer+2), (void *)default_string, 18);
+        default:
+                    memcpy( (void *)(priTransferDataBuffer), (void *)default_string, 18);
                     
 			}
 		
@@ -234,7 +183,8 @@ static void Initial_Register(void)
     memset(&output_test,0,sizeof(eps_set_output));
 	
 
-    hk_test.pc = 0X1234;
+    /*inital Node 0x08 register*/
+	hk_test.pc = 0X1234;
 /* 
     chkparam_t hk_test = 
 	{
@@ -262,79 +212,73 @@ static void Initial_Register(void)
 static void Update_Register(void *argument)
 {
     /* for the test */    
-    //uint8_t buff[6] ={0,0,0,0,0,0};
-    uint8_t *output_test = "popout\n";
-		
+    uint8_t buff[6] ={0,0,0,0,0,0};
+	
+	/* for period */
 	portTickType xLastWakeTime;
 	
+	/* for queue */
 	portBASE_TYPE xStatus;
     
-    xData test2;
-    uint16_t* temp_int = NULL;
-			
-	//prvNewPrintString("Hey",3);
+	/*temp of xData*/
+    xData temp_queue_data;
+    
+    /*temp of subsystem data package, please ref to "Environment.h"*/
+    uint16_t temp_ref_package = 0;
+    xData_EPS_Package_1* temp_package = NULL;
+
+    
 	xLastWakeTime = xTaskGetTickCount();
     prvNewPrintString("Update Reg\n",12);
 	
     for(;;)
-	{
-		//prvNewPrintString("Hey",3);    
+	{  
         /* for Queue Test */
         if(xQueue_EPS!=0)
         {
-            //for(;;)
-                if(uxQueueMessagesWaiting(xQueue_EPS) != 0)
+            while(uxQueueMessagesWaiting(xQueue_EPS) != 0)
+            {
+                 /* Peek the IEPS Queue */
+                xStatus = xQueuePeek(xQueue_EPS, &temp_queue_data ,0);
+                temp_ref_package = temp_queue_data.refPackage;
+
+                switch (temp_ref_package)
                 {
-                    //prvNewPrintString("Hey",3);
-                    //prvNewPrintString(output_test,7);
-    
-                    xStatus = xQueueReceive(xQueue_EPS, &test2 ,0);
-                    if(xStatus == pdPASS)
-                    {
+                    case ref_envEPS_Package_1:
+                        xStatus = xQueueReceive(xQueue_EPS, &temp_queue_data ,0);
+                        
+                        if(xStatus == pdPASS)
+                        {
                         //prvNewPrintString("Success ",8);
                     
-                        switch(test2.refRegister)
-                        {
-                            case ref_envEPS_Battery_Voltage:
-                    
-                            temp_int = (type_envEPS_Battery_Voltage *)test2.ptrRegister;
-                            /*get register value from Queue*/
-                            envEPS_Battery_Voltage = *temp_int;
-                            break;
-                                      
-                            default:
-                            prvNewPrintString("Something Wrong",15); 
-                        }
-                
-                    /* Print to Screen*/
-                    //sprintf (buff, "%d", *temp_int);
-                    //prvNewPrintString(buff,6);
-                
-                    free(temp_int);
-                            
-                    //Register(Port) 8
-                    hk_test.bv = envEPS_Battery_Voltage;
-                    
-                    //Register(Port) 14
-                    }
-                    else
-                        prvNewPrintString("Fail",4);
-                    
-                    //vTaskDelayUntil( &xLastWakeTime, 1000 );
-                }
-                else
-                {
-                    prvNewPrintString("Empty ",6);
-                    break;
-                }
+                        temp_package = (xData_EPS_Package_1 *)temp_queue_data.ptrPackage;
 
+                        /*Set register value from Queue*/
+                        hk_test.bv = (*temp_package).envEPS_Battery_Voltage;
+
+                        /* Print to Screen*/
+                        sprintf (buff, "%04X", hk_test.bv);
+                        prvNewPrintString(buff,6);
+                
+                        vPortFree(temp_package);
+                        }
+                        else
+                            prvNewPrintString("Fail",4);
+                        
+                        break;
+                    default:
+                        prvNewPrintString("Ref. Package Error ",19);
+                }
+                
+            }
         }
 
 			
 		//vTaskDelayUntil( &xLastWakeTime, (1000/portTICK_RATE_MS) );
         //prvNewPrintString(output_test,7);
             
-        vTaskDelayUntil( &xLastWakeTime, 1000 );
+        /* Data Update Period*/
+        vTaskDelayUntil( &xLastWakeTime, 10 );
 	}
 }
   
