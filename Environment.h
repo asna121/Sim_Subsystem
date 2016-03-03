@@ -17,8 +17,8 @@
 /* Queue Handler of each Subsystem */
 
 extern xQueueHandle xQueue_EPS;
-//extern xQueueHandle xQueue_ADCS;
-//extern xQueueHandle xQueue_IFB;
+extern xQueueHandle xQueue_ADCS;
+extern xQueueHandle xQueue_IFB;
 
 /* submain of Environment*/
 extern void submain_Environment(void);
@@ -51,15 +51,15 @@ typedef struct
 #pragma pack(pop)
 
 /* ADCS Package 1 */
-// #pragma pack(push, 1)
-// typedef struct
-// {
-    // uint16_t envADCS_Estimated_Angular_X;
-    // uint16_t envADCS_Estimated_Angular_Y;
-    // uint16_t envADCS_Estimated_Angular_Z;
+ #pragma pack(push, 1)
+ typedef struct
+ {
+     uint16_t envADCS_Estimated_Angular_X;
+     uint16_t envADCS_Estimated_Angular_Y;
+     uint16_t envADCS_Estimated_Angular_Z;
 
-// }xData_ADCS_Package_1;
-// #pragma pack(pop)
+ }xData_ADCS_Package_1;
+ #pragma pack(pop)
 
 /* ADCS Package 2 */
 // #pragma pack(push, 1)
@@ -73,16 +73,16 @@ typedef struct
 // #pragma pack(pop)
 
 /* IFB Package 1 */
-//#pragma pack(push, 1)
-//typedef struct
-//{
-//    uint16_t envIFB_5V_Current;
-//    uint16_t envIFB_3_3V_Current;
-//    uint16_t envIFB_INMS_Temp;
-//    uint16_t envIFB_IFB_Temp;
+#pragma pack(push, 1)
+typedef struct
+{
+    uint16_t envIFB_5V_Current;
+    uint16_t envIFB_3_3V_Current;
+    uint16_t envIFB_INMS_Temp;
+    uint16_t envIFB_IFB_Temp;
     
-//}xData_IFB_Package_1;
-//#pragma pack(pop)
+}xData_IFB_Package_1;
+#pragma pack(pop)
 
 /* Define -------------------------------------------------------------------*/
 
@@ -117,14 +117,14 @@ Define the input file in the USB disk.
 #define size_fileEPS_Battery_Voltage 2
 
 /* ADCS File Item Size*/
-//#define size_fileADCS_Estimated_Angular_X 2
-//#define size_fileADCS_Estimated_Angular_Y 2
-//#define size_fileADCS_Estimated_Angular_Z 2
+#define size_fileADCS_Estimated_Angular_X 2
+#define size_fileADCS_Estimated_Angular_Y 2
+#define size_fileADCS_Estimated_Angular_Z 2
 
 /* IFB File Item Size*/
-//#define size_fileIFB_5V_Current 2
-//#define size_fileIFB_3_3V_Current 2
-//#define size_fileIFB_INMS_Temp 2
-//#define size_fileIFB_IFB_Temp 2
+#define size_fileIFB_5V_Current 2
+#define size_fileIFB_3_3V_Current 2
+#define size_fileIFB_INMS_Temp 2
+#define size_fileIFB_IFB_Temp 2
 
 #endif /* __ENVIRONMENT_H */

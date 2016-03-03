@@ -241,8 +241,12 @@ static void Update_Register(void *argument)
                         angular_test.z_rate = (*temp_package).envADCS_Estimated_Angular_Z;
                     
                         /* Print to Screen*/
-                        sprintf (buff, "%04X", angular_test.y_rate);
+                        sprintf (buff, "%04X", angular_test.x_rate);
                         prvNewPrintString(buff,6);
+						//sprintf (buff, "%04X", angular_test.y_rate);
+                        //prvNewPrintString(buff,6);
+						//sprintf (buff, "%04X\n", angular_test.z_rate);
+                        //prvNewPrintString(buff,6);
                 
                         vPortFree(temp_package);
                         }

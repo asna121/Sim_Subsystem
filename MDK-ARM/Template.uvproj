@@ -450,9 +450,9 @@
               <FilePath>..\Common\common.c</FilePath>
             </File>
             <File>
-              <FileName>EPS_NanoPower_P31U.c</FileName>
+              <FileName>INMS_IF_board.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Module\EPS_NanoPower_P31U.c</FilePath>
+              <FilePath>..\Module\INMS_IF_board.c</FilePath>
             </File>
           </Files>
         </Group>
