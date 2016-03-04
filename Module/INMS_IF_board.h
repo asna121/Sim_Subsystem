@@ -22,3 +22,6 @@ typedef struct IFB_CURRENT_TEMPERATURE{
 /* private variable define*/
  
 #define  priI2C_NewCommand_2 priI2Cx_2_NewCommand
+
+#undef I2Cx_2_ADDRESS
+#define I2Cx_2_ADDRESS (0x7D<<1)

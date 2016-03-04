@@ -54,3 +54,8 @@ typedef struct EPS_SET_OUTPUT {
 /* private variable define*/
  
 #define  priI2C_NewCommand_2 priI2Cx_2_NewCommand
+
+#undef I2Cx_2_ADDRESS
+#define I2Cx_2_ADDRESS 0x04
+
+//(0x72<<1)

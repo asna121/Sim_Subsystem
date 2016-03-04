@@ -46,7 +46,7 @@ void Init_Peripheral(void)
   I2CxHandle_2.Init.DutyCycle       = I2C_DUTYCYCLE_16_9;
   I2CxHandle_2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
   I2CxHandle_2.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
-  I2CxHandle_2.Init.OwnAddress1     = I2C_2_ADDRESS;
+  I2CxHandle_2.Init.OwnAddress1     = I2Cx_2_ADDRESS;
   I2CxHandle_2.Init.OwnAddress2     = 0;
 	
 	if(HAL_I2C_Init(&I2CxHandle_2) != HAL_OK)

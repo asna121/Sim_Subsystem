@@ -7,3 +7,6 @@ void submain_ADCS(I2C_HandleTypeDef *argument);
 /* private variable define*/
  
 #define  priI2C_NewCommand_2 priI2Cx_2_NewCommand
+
+#undef I2Cx_2_ADDRESS
+#define I2Cx_2_ADDRESS (0x77<<1)

@@ -193,13 +193,13 @@ static void MSC_Application(void)
     prvNewPrintString(" #@START@# ",12);
 	
 	//Enable EPS Environment Data Input Task
-	//EPS_Data_Input();
+	EPS_Data_Input();
 	
 	//Enable ADCS Environment Data Input Task
 	//ADCS_Data_Input();
 	
 	//Enable IFB Environment Data Input Task
-	IFB_Data_Input();
+	//IFB_Data_Input();
 	
 }
 
